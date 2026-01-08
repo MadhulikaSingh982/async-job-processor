@@ -1,5 +1,6 @@
 package com.example.asyncjobprocessor.service;
 
+import com.example.asyncjobprocessor.exception.JobNotFoundException;
 import com.example.asyncjobprocessor.model.Job;
 import com.example.asyncjobprocessor.model.JobStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -35,6 +36,10 @@ public class JobService {
     }
 
     public Job getJob(String jobId) {
-        return jobs.get(jobId);
+        Job job = jobs.get(jobId);
+        if(job == null) {
+            throw new JobNotFoundException(jobId);
+        }
+        return job;
     }
 }

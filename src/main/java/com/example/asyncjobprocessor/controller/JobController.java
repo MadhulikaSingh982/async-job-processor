@@ -23,10 +23,6 @@ public class JobController {
 
     @GetMapping("/{jobId}")
     public Job getJobStatus(@PathVariable String jobId) {
-        Job job = jobService.getJob(jobId);
-        if(job == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Job Not Found");
-        }
-        return job;
+        return jobService.getJob(jobId);
     }
 }
