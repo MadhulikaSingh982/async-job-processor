@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/jobs")
 public class JobController {
@@ -24,5 +26,16 @@ public class JobController {
     @GetMapping("/{jobId}")
     public Job getJobStatus(@PathVariable String jobId) {
         return jobService.getJob(jobId);
+    }
+
+    @GetMapping
+    public List<Job> listJobs (
+            @RequestParam(defaultValue="0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        if(page<0 || size<0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameters for pagination");
+        }
+        return jobService.getJobs(page, size);
     }
 }
