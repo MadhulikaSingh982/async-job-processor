@@ -14,6 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JobService {
 
     Map<String, Job> jobs = new ConcurrentHashMap<>();
+    private final JobProcessor jobProcessor;
+
+    public JobService(JobProcessor jobProcessor) {
+        this.jobProcessor = jobProcessor;
+    }
 
     public Job createJob() {
         String jobId = UUID.randomUUID().toString();
@@ -24,24 +29,12 @@ public class JobService {
 
         jobs.put(jobId, job);
 
-        processJobAsync(jobId);
+        jobProcessor.processJob(jobId, jobs);
 
         return job;
     }
 
-    @Async
-    public void processJobAsync(String jobId) {
-        try {
-            // Simulate long-running work
-            Thread.sleep(3000);
-
-            Job job = jobs.get(jobId);
-            if(job != null) {
-                job.setStatus(JobStatus.COMPLETED);
-                job.setProcessedAt(LocalDateTime.now());
-            }
-        } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    public Job getJob(String jobId) {
+        return jobs.get(jobId);
     }
 }

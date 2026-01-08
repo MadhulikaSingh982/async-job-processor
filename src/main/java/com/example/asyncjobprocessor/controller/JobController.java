@@ -2,9 +2,9 @@ package com.example.asyncjobprocessor.controller;
 
 import com.example.asyncjobprocessor.model.Job;
 import com.example.asyncjobprocessor.service.JobService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/jobs")
@@ -19,5 +19,14 @@ public class JobController {
     @PostMapping
     public Job submitJob() {
         return jobService.createJob();
+    }
+
+    @GetMapping("/{jobId}")
+    public Job getJobStatus(@PathVariable String jobId) {
+        Job job = jobService.getJob(jobId);
+        if(job == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Job Not Found");
+        }
+        return job;
     }
 }
