@@ -1,8 +1,10 @@
 package com.example.asyncjobprocessor.service;
 
+import com.example.asyncjobprocessor.event.JobCreatedEvent;
 import com.example.asyncjobprocessor.exception.JobNotFoundException;
 import com.example.asyncjobprocessor.model.Job;
 import com.example.asyncjobprocessor.model.JobStatus;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class JobService {
 
-    Map<String, Job> jobs = new ConcurrentHashMap<>();
-    private final JobProcessor jobProcessor;
+    private final Map<String, Job> jobs = new ConcurrentHashMap<>();
+    private final ApplicationEventPublisher eventPublisher;
 
-    public JobService(JobProcessor jobProcessor) {
-        this.jobProcessor = jobProcessor;
+    public JobService(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     public Job createJob() {
@@ -32,7 +34,7 @@ public class JobService {
 
         jobs.put(jobId, job);
 
-        jobProcessor.processJob(jobId, jobs);
+        eventPublisher.publishEvent(new JobCreatedEvent(jobId));
 
         return job;
     }
@@ -52,5 +54,9 @@ public class JobService {
                 .skip((long)page*size)
                 .limit(size)
                 .toList();
+    }
+
+    public Map<String, Job> getJobsMap() {
+        return jobs;
     }
 }
